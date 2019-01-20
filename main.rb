@@ -41,22 +41,18 @@ class GalleryDownloader
 
 	# Transforms a gallery page into a list of urls.
 	def image_urls resource
-		new_doc = seperate_lines resource
-		new_doc = perform_instructions @g_ins, new_doc
-		new_doc = regex_href_search new_doc, ""
-		new_doc.split("\n")
+		opperate resource, @g_ins
 	end
 
 	# this assumes in the case of regex that there is only one match
 	def get_image_uris image_page
-		new_doc = seperate_lines image_page
-		new_doc = perform_instructions @i_ins, new_doc
-		new_doc = regex_src_search new_doc, @i_regex.source
-		new_doc.split("\n")
+		opperate image_page, @i_ins
 	end
 
-	def set_image_regex regex
-		@i_regex = regex
+	def opperate webpage, instructions
+		lines = seperate_lines webpage
+		lines = perform_instructions instructions, lines
+		lines.split("\n")
 	end
 
 	private
