@@ -1,6 +1,8 @@
 class INS
 	@@find_first = "FF"
 	@@remove = "R"
+	@@src_search = "SS"
+	@@href_search = "HS"
 
 	def self.find_first
 		@@find_first
@@ -9,12 +11,22 @@ class INS
 	def self.remove
 		@@remove
 	end
+
+	def self.src_search
+		@@src_search
+	end
+
+	def self.href_search
+		@@href_search
+	end
 end
 
 class GalleryDownloader
 	def initialize()
 		@funcs = {INS.find_first => :find_first_element,
-			INS.remove => :remove_element}
+			INS.remove => :remove_element,
+			INS.src_search => :regex_src_search,
+			INS.href_search => :regex_href_search}
 		@g_ins = []
 		@i_ins = []
 	end
@@ -31,14 +43,16 @@ class GalleryDownloader
 	def image_urls resource
 		new_doc = seperate_lines resource
 		new_doc = perform_instructions @g_ins, new_doc
-		new_doc.scan(/(?<=href=\")[^"]*(?=\")/)
+		new_doc = regex_href_search new_doc, ""
+		new_doc.split("\n")
 	end
 
 	# this assumes in the case of regex that there is only one match
 	def get_image_uris image_page
 		new_doc = seperate_lines image_page
 		new_doc = perform_instructions @i_ins, new_doc
-		new_doc.scan(/(?<=src=\")[^"]*#{@i_regex.source}[^"]*(?=\")/)
+		new_doc = regex_src_search new_doc, @i_regex.source
+		new_doc.split("\n")
 	end
 
 	def set_image_regex regex
@@ -100,6 +114,18 @@ class GalleryDownloader
 			end
 		end
 		new
+	end
+
+	def regex_src_search resource, query
+		regex_attribute_search resource, "src", query
+	end
+
+	def regex_href_search resource, query
+		regex_attribute_search resource, "href", query
+	end
+
+	def regex_attribute_search resource, attribute, query
+		resource.scan(/(?<=#{attribute}=\")[^"]*#{query}[^"]*(?=\")/).join("\n")
 	end
 end
 
