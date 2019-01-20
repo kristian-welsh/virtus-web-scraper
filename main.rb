@@ -35,10 +35,10 @@ class GalleryDownloader
 	end
 
 	# this assumes in the case of regex that there is only one match
-	def get_image_uri image_page
+	def get_image_uris image_page
 		new_doc = seperate_lines image_page
 		new_doc = perform_instructions @i_ins, new_doc
-		new_doc.scan(/(?<=src=\")[^"]*#{@i_regex.source}[^"]*(?=\")/)[0]
+		new_doc.scan(/(?<=src=\")[^"]*#{@i_regex.source}[^"]*(?=\")/)
 	end
 
 	def set_image_regex regex
@@ -102,5 +102,4 @@ class GalleryDownloader
 		new
 	end
 end
-
 
